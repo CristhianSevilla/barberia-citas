@@ -13,7 +13,7 @@
     </div>
 
     <div class="alinear-derecha">
-    <input type="sunmit" class="boton" value="Enviar instrucciones">
+    <input type="submit" class="boton" value="Enviar instrucciones">
     </div>
 </form>
 

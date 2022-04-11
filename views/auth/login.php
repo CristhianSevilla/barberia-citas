@@ -21,7 +21,7 @@
         />
     </div>
     <div class="alinear-derecha">
-    <input type="sunmit" class="boton" value="Iniciar Sesión">
+    <input type="submit" class="boton" value="Iniciar Sesión">
     </div>
 </form>
 
