@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Classes\Email;
 use Model\Usuario;
 use MVC\Router;
 
@@ -9,7 +10,7 @@ class LoginController
 {
     public static function login(Router $router)
     {
-        
+
         $router->render('auth/login');
     }
 
@@ -21,7 +22,6 @@ class LoginController
     public static function olvide(Router $router)
     {
         $router->render('auth/olvide');
-        
     }
 
     public static function recuperar()
@@ -34,7 +34,7 @@ class LoginController
         $usuario = new Usuario;
 
         //Alertas vacias
-        $alertas=[];
+        $alertas = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -42,20 +42,45 @@ class LoginController
 
             $alertas = $usuario->validarNuevacuenta();
 
+            //Verificar que el usuario no este registrado
             if (empty($alertas)) {
-               //Verificar que el usuario no este registrado
-               $resultado = $usuario->existeUsuario();
+                $resultado = $usuario->existeUsuario();
 
-               if ($resultado->num_rows) {
-                   $alertas = Usuario::getAlertas();
-               }
+                if ($resultado->num_rows) {
+                //el usuario esta registrado
+                    $alertas = Usuario::getAlertas();
+                }else{
+                    //el usuario no esta registrado
+
+                    //hashear password
+                    $usuario->hashearPassword();
+
+                    //generar un token
+                    $usuario->crearToken();
+
+                    //Enviar el email
+                    $email = new Email($usuario->email, $usuario->nombre, $usuario->token);
+
+                    $email->enviarConfirmacion();
+
+                    //Crear usuario en BD
+                    $resultado = $usuario->guardar();
+
+                    if ($resultado) {
+                        header('Location: /mensaje');
+                    }
+
+                }
             }
-
         }
 
         $router->render('auth/crear-cuenta', [
             'usuario' => $usuario,
             'alertas' => $alertas
         ]);
+    }
+
+    public static function mensaje (Router $router){
+        $router->render('auth/mensaje');
     }
 }

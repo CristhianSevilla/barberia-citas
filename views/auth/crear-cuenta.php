@@ -1,5 +1,5 @@
 <h1 class="nombre-pagina">Crear cuenta</h1>
-<p class="descripcion-pagina">LLena el sigueinte formulario para crear una cuenta</p>
+<p class="descripcion-pagina">LLena el siguiente formulario para crear una cuenta</p>
 
 <?php
 
