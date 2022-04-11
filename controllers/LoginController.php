@@ -44,6 +44,11 @@ class LoginController
 
             if (empty($alertas)) {
                //Verificar que el usuario no este registrado
+               $resultado = $usuario->existeUsuario();
+
+               if ($resultado->num_rows) {
+                   $alertas = Usuario::getAlertas();
+               }
             }
 
         }
