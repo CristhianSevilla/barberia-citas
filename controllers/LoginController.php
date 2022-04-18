@@ -47,9 +47,9 @@ class LoginController
                 $resultado = $usuario->existeUsuario();
 
                 if ($resultado->num_rows) {
-                //el usuario esta registrado
+                    //el usuario esta registrado
                     $alertas = Usuario::getAlertas();
-                }else{
+                } else {
                     //el usuario no esta registrado
 
                     //hashear password
@@ -69,7 +69,6 @@ class LoginController
                     if ($resultado) {
                         header('Location: /mensaje');
                     }
-
                 }
             }
         }
@@ -80,7 +79,44 @@ class LoginController
         ]);
     }
 
-    public static function mensaje (Router $router){
+    public static function mensaje(Router $router)
+    {
         $router->render('auth/mensaje');
+    }
+
+    public static function confirmar(Router $router)
+    {
+
+        $alertas = [];
+
+        //Recuperar token de la url
+        $token = s($_GET['token']);
+
+        //Buscar token en BD
+        $usuario = Usuario::where('token', $token);
+
+        if (empty($usuario)) {
+            //Mostrar Mensaje de error
+            Usuario::setAlerta('error', 'Token no válido');
+        } else {
+            //Modificar a usuario confirmado En BD
+
+            // Se confirma
+            $usuario->confirmado = "1";
+            // Se borra el token para que no pueda volver a ser usado
+            $usuario->token = null;
+            //Y se guardan los cambios en la BD
+            $usuario->guardar();
+
+            $usuario = Usuario::setAlerta('exito', 'Cuenta confirmada correctamente');
+        }
+
+        //Obtener alertas
+        $alertas = Usuario::getAlertas();
+
+        //Renderizar la vista
+        $router->render('auth/confirmar-cuenta', [
+            'alertas' => $alertas
+        ]);
     }
 }
