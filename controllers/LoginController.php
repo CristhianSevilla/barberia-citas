@@ -11,7 +11,56 @@ class LoginController
     public static function login(Router $router)
     {
 
-        $router->render('auth/login');
+        $alertas = [];
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $auth = new Usuario($_POST);
+
+            //Validar que ingrese un email y un password
+            $alertas = $auth->validarLogin();
+
+            if (empty($alertas)) {
+                //Validar que el usuario exista
+                $usuario = Usuario::where('email', $auth->email);
+
+                if ($usuario) {
+
+                    //verificar que la cuenta de correo este conifirmada y comprobar el password
+                    if ($usuario->comprobarPassAndVerific($auth->password)) {
+
+                        if(!isset($_SESSION)) {
+                            session_start();
+                        };
+
+                        // session_start();
+
+                        $_SESSION['id'] = $usuario->id;
+                        $_SESSION['nombre'] = $usuario->nombre . " " . $usuario->apellido;
+                        $_SESSION['email'] = $usuario->email;
+                        $_SESSION['login'] = true;
+
+
+                        //Redireccionar al usuario
+                        if ($usuario->admin === "1") {
+                            $_SESSION['admin'] = $usuario->admin ?? null;
+
+                            header('Location: /admin');
+                        }else{
+                            header('Location: /cita');
+                        }
+                    }
+
+                } else {
+                    Usuario::setAlerta('error', 'Usuario no encontrado, verifica tu e-mail');
+                }
+            }
+        }
+
+        $alertas = Usuario::getAlertas();
+
+        $router->render('auth/login', [
+            'alertas' => $alertas
+        ]);
     }
 
     public static function logout()
@@ -108,7 +157,7 @@ class LoginController
             //Y se guardan los cambios en la BD
             $usuario->guardar();
 
-            $usuario = Usuario::setAlerta('exito', 'Cuenta confirmada correctamente');
+            $usuario = Usuario::setAlerta('exito', 'Cuenta confirmada exitosamente, ya puedes iniciar sesión');
         }
 
         //Obtener alertas

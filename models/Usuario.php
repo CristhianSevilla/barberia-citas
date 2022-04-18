@@ -2,7 +2,10 @@
 
 namespace Model;
 
-class Usuario extends ActiveRecord{
+use Classes\Email;
+
+class Usuario extends ActiveRecord
+{
     //Base de datos
     protected static $tabla = 'usuarios';
     protected static $columnasDB = ['id', 'nombre', 'apellido', 'email', 'password', 'telefono', 'admin', 'confirmado', 'token'];
@@ -17,7 +20,8 @@ class Usuario extends ActiveRecord{
     public $confirmado;
     public $token;
 
-    public function __construct($args = []){
+    public function __construct($args = [])
+    {
         $this->id = $args['id'] ?? null;
         $this->nombre = $args['nombre'] ?? '';
         $this->apellido = $args['apellido'] ?? '';
@@ -30,7 +34,8 @@ class Usuario extends ActiveRecord{
     }
 
     //Mensajes de validación para la creacion de una cuenta
-    public function validarNuevacuenta(){
+    public function validarNuevacuenta()
+    {
         if (!$this->nombre) {
             self::$alertas['error'][] = 'El nombre es obligatorio';
         }
@@ -47,30 +52,61 @@ class Usuario extends ActiveRecord{
             self::$alertas['error'][] = 'El password es obligatorio';
         }
         if (strlen($this->password) < 6) {
-            self::$alertas['error'] [] = 'El password debe contener al menos 6 caracteres';
+            self::$alertas['error'][] = 'El password debe contener al menos 6 caracteres';
         }
-return self::$alertas;
+        return self::$alertas;
     }
 
     //Validar si el usuario ya existe
-    public function existeUsuario(){
+    public function existeUsuario()
+    {
         $query = "SELECT * FROM " . self::$tabla . " WHERE email = '" . $this->email . "' LIMIT 1";
 
         $resultado = self::$db->query($query);
 
         if ($resultado->num_rows) {
-            self::$alertas['error'] [] = 'El usuario ya esta registrado';
+            self::$alertas['error'][] = 'El usuario ya esta registrado';
         }
 
         return $resultado;
     }
 
-    public function hashearPassword(){
+    public function hashearPassword()
+    {
         $this->password = password_hash($this->password, PASSWORD_BCRYPT);
     }
 
-    public function crearToken(){
+    public function crearToken()
+    {
         $this->token = uniqid();
     }
 
+    public function validarLogin()
+    {
+        if (!$this->email) {
+            self::$alertas['error'][] = 'El e-mail es obligatorio';
+        }
+
+        if (!$this->password) {
+            self::$alertas['error'][] = 'El password es obligatorio';
+        }
+
+        return self::$alertas;
+    }
+
+    public function comprobarPassAndVerific($password)
+    {
+
+        $resultado = password_verify($password, $this->password);
+
+        if (!$resultado) {
+            self::$alertas['error'][] = 'Password incorrecto';
+        }else{
+            if (!$this->confirmado) {
+                self::$alertas['error'][] = 'Confirma tu cuenta, Hemos enviado las instrucciones a tu e-mail';
+            } else {
+                return true;
+            }
+        }
+    }
 }
