@@ -57,6 +57,25 @@ class Usuario extends ActiveRecord
         return self::$alertas;
     }
 
+    public function validarEmail()
+    {
+        if (!$this->email) {
+            self::$alertas['error'][] = 'El email es obligatorio';
+        }
+        return self::$alertas;
+    }
+
+    public function validarPassword()
+    {
+        if (!$this->password) {
+            self::$alertas['error'][] = 'El password es obligatorio';
+        }
+        if (strlen($this->password) < 6) {
+            self::$alertas['error'][] = 'El password debe contener al menos 6 caracteres';
+        }
+        return self::$alertas;
+    }
+
     //Validar si el usuario ya existe
     public function existeUsuario()
     {
@@ -101,7 +120,7 @@ class Usuario extends ActiveRecord
 
         if (!$resultado) {
             self::$alertas['error'][] = 'Password incorrecto';
-        }else{
+        } else {
             if (!$this->confirmado) {
                 self::$alertas['error'][] = 'Confirma tu cuenta, Hemos enviado las instrucciones a tu e-mail';
             } else {
