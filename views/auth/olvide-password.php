@@ -1,4 +1,4 @@
-<h1 class="nombre-pagina">Olvide mi password</h1>
+<h1 class="nombre-pagina">Olvidé mi password</h1>
 <p class="descripcion-pagina">Reestablece tu password escribiendo tu e-mail</p>
 
 <?php
