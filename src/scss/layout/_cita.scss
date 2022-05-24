@@ -1,5 +1,11 @@
 @use 'base/variables' as v;
 @use 'base/mixins' as m;
+.descripcion-pagina {
+    span {
+        color: v.$azul;
+    }
+}
+
 .seccion {
     padding: calc(v.$separacion/2) 0;
     display: none;

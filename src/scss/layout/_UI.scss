@@ -19,6 +19,13 @@
         width: 90%;
         margin: 0 auto;
         padding-bottom: 3rem;
+        @include m.tablet {
+            overflow-y: scroll;
+            &::-webkit-scrollbar {
+                display: none;
+                // opacity: 0;
+            }
+        }
     }
 }
 
@@ -26,5 +33,32 @@
     @include m.tablet {
         display: flex;
         justify-content: flex-end;
+    }
+}
+
+.barra {
+    margin: v.$separacion 0;
+    @include m.tablet {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin: calc(v.$separacion/2) 0;
+        p {
+            margin: 0
+        }
+    }
+    .boton {
+        @include m.boton(darken(v.$negro, 15), v.$blanco, v.$azul, 2rem);
+    }
+}
+
+.barra-servicios {
+    margin-bottom: v.$separacion;
+    @include m.tablet {
+        display: flex;
+        justify-content: space-between;
+    }
+    .boton {
+        margin: 0 0 1rem 0;
     }
 }
